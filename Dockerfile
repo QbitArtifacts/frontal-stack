@@ -6,4 +6,5 @@ RUN add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/$(. /
 RUN apt update && apt install -y docker-ce-cli
 COPY haproxy.cfg /
 COPY docker-entrypoint.sh /
+WORKDIR /
 CMD /docker-entrypoint.sh

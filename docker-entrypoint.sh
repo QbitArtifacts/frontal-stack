@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
 
-if ! test -f /etc/ssl;then
-  mkdir -p /etc/ssl
+export HAPROXY_CONFIG=/etc/haproxy/haproxy.cfg 
+export SSL_DIR=/etc/ssl
+export CRT_LIST=$SSL_DIR/crt-list.txt
+export TMP_CONFIG_FRONTEND=/tmp/$RANDOM$RANDOM$RANDOM
+export TMP_CONFIG_BACKEND=/tmp/$RANDOM$RANDOM$RANDOM
+
+if ! test -f $SSL_DIR;then
+  mkdir -p $SSL_DIR
 fi
 
 read_label(){
@@ -68,8 +74,8 @@ add_cert(){
   domain=$1
   list_file=$2
   cd /etc/letsencrypt/live/$domain
-  cat fullchain.pem privkey.pem > /etc/ssl/$domain.pem
-  echo "/etc/ssl/$domain.pem" >> $list_file
+  cat fullchain.pem privkey.pem > $SSL_DIR/$domain.pem
+  echo "$SSL_DIR/$domain.pem" >> $list_file
   cd -
 }
 
@@ -82,19 +88,19 @@ generate_backend(){
 
 generate_ssl_redirect(){
   domain=$1
-  echo -e "redirect scheme https if !{ ssl_fc} { hdr(host) -i $domain }"
+  echo -e "\tredirect scheme https if !{ ssl_fc} { hdr(host) -i $domain }"
 }
 
 generate_link(){
   domain=$1
   name=$2
-  echo -e "use_backend $name if !{ ssl_fc } { hdr(host) -i $domain }"
+  echo -e "\tuse_backend $name if !{ ssl_fc } { hdr(host) -i $domain }"
 }
 
 generate_link_ssl(){
   domain=$1
   name=$2
-  echo -e "use_backend $name if { ssl_fc_sni $domain }"
+  echo -e "\tuse_backend $name if { ssl_fc_sni $domain }"
 }
 
 docker service ls --format='{{.Name}}' | while read service;do
@@ -110,46 +116,45 @@ docker service ls --format='{{.Name}}' | while read service;do
     mandatory $domain "frontal.domain"
     mandatory $target_port "frontal.target.port"
 
-    echo $domain
-    echo $path
-    echo $tls
-    echo $https_port
-    echo $http_port
-    echo $target_port
+    echo "domain: $domain"
+    echo "path: $path"
+    echo "tls: $tls"
+    echo "target_port: $target_port"
 
     if [[ "$tls" != "no" ]];then
       if ! cert_ok $domain;then
         issue_cert $domain $LE_EMAIL $LE_AGREE_TOS $LE_MODE
       fi
-      add_cert $domain /etc/ssl/crt-list.txt
+      add_cert $domain $CRT_LIST
     fi
 
-    generate_backend $service_name $target_port >> /etc/haproxy/backends.cfg
+    generate_backend $service_name $target_port >> $TMP_CONFIG_BACKEND
 
     case $tls in
       force)
-        generate_ssl_redirect $domain >> /etc/haproxy/redirects.cfg
-        generate_link_ssl $domain $service_name >> /etc/haproxy/bindings.cfg
+        generate_ssl_redirect $domain >> $TMP_CONFIG_FRONTEND
+        generate_link_ssl $domain $service_name >> $TMP_CONFIG_FRONTEND
       ;;
       yes)
-        generate_link $domain $service_name >> /etc/haproxy/bindings.cfg
-        generate_link_ssl $domain $service_name >> /etc/haproxy/bindings.cfg
+        generate_link $domain $service_name >> $TMP_CONFIG_FRONTEND
+        generate_link_ssl $domain $service_name >> $TMP_CONFIG_FRONTEND
       ;;
       no)
-        generate_link $domain $service_name >> /etc/haproxy/bindings.cfg
+        generate_link $domain $service_name >> $TMP_CONFIG_FRONTEND
       ;;
       only)
-        generate_link_ssl $domain $service_name >> /etc/haproxy/bindings.cfg
+        generate_link_ssl $domain $service_name >> $TMP_CONFIG_FRONTEND
       ;;
       *)
         throw_error "invalid option '$tls' for label frontal.tls" >&2
       ;;
     esac
-    #target_host=`cut -d_ -f2 <<<$service` # TODO: find the host value from service
   fi
 done
 
+cat haproxy.cfg $TMP_CONFIG_FRONTEND $TMP_CONFIG_BACKEND > $HAPROXY_CONFIG
+rm $TMP_CONFIG_FRONTEND $TMP_CONFIG_BACKEND
 
-haproxy -f /etc/haproxy/default.cfg -f /etc/haproxy/redirects.cfg -f /etc/haproxy/backends.cfg -f /etc/haproxy/bindings.cfg
+haproxy -f $HAPROXY_CONFIG
 
 # docker service inspect rec-stage_frontal --format='{{json .Spec.TaskTemplate.Networks}}' | jq -r '.[0].Target'

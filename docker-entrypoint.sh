@@ -95,13 +95,15 @@ generate_ssl_redirect(){
 generate_link(){
   domain=$1
   name=$2
-  echo -e "  use_backend $name if !{ ssl_fc } { hdr(host) -i $domain }"
+  path=$3
+  echo -e "  use_backend $name if !{ ssl_fc } { hdr(host) -i $domain } { path_beg $path }"
 }
 
 generate_link_ssl(){
   domain=$1
   name=$2
-  echo -e "  use_backend $name if { ssl_fc_sni $domain }"
+  path=$3
+  echo -e "  use_backend $name if { ssl_fc_sni $domain } { path_beg $path }"
 }
 
 docker service ls --format='{{.Name}}' | while read service;do
@@ -135,17 +137,17 @@ docker service ls --format='{{.Name}}' | while read service;do
     case $tls in
       force)
         generate_ssl_redirect $domain >> $HAPROXY_CONFIG
-        generate_link_ssl $domain $service_network >> $HAPROXY_CONFIG
+        generate_link_ssl $domain $service_network $path >> $HAPROXY_CONFIG
       ;;
       yes)
-        generate_link $domain $service_network >> $HAPROXY_CONFIG
-        generate_link_ssl $domain $service_network >> $HAPROXY_CONFIG
+        generate_link $domain $service_network $path >> $HAPROXY_CONFIG
+        generate_link_ssl $domain $service_network $path >> $HAPROXY_CONFIG
       ;;
       no)
-        generate_link $domain $service_network >> $HAPROXY_CONFIG
+        generate_link $domain $service_network $path >> $HAPROXY_CONFIG
       ;;
       only)
-        generate_link_ssl $domain $service_network >> $HAPROXY_CONFIG
+        generate_link_ssl $domain $service_network $path >> $HAPROXY_CONFIG
       ;;
       *)
         throw_error "invalid option '$tls' for label frontal.tls" >&2

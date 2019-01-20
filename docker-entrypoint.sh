@@ -87,7 +87,7 @@ generate_backend(){
 
 generate_ssl_redirect(){
   domain=$1
-  echo -e "  redirect scheme https if !{ ssl_fc} { hdr(host) -i $domain }"
+  echo -e "  redirect scheme https if !{ ssl_fc } { hdr(host) -i $domain }"
 }
 
 generate_link(){

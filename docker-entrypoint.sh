@@ -51,14 +51,14 @@ issue_cert(){
   mode=$4
   if [[ "$agree_tos" == "yes" ]];then
     if [[ "$mode" == "test" ]];then
-      certbot certonly --standalone -n --test-cert --dry-run --agree-tos -m $email -d $domain
+      certbot certonly --standalone -n --test-cert --agree-tos -m $email -d $domain
     else
       certbot certonly --standalone -n --agree-tos -m $email -d $domain
     fi
     return
   fi
   if [[ "$mode" == "test" ]];then
-    certbot certonly --standalone -n --test-cert --dry-run -m $email -d $domain
+    certbot certonly --standalone -n --test-cert -m $email -d $domain
   else
     certbot certonly --standalone -n -m $email -d $domain
   fi

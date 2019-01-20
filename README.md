@@ -20,7 +20,7 @@ Some notes we have to take into account
 ## Sample configuration
 
 ```yaml
-# file: stack.yml
+# file: example-stack.yml
 # This example starts a mariadb server and adminer on url https://admin.example.com/db
 version: "3.7"
 

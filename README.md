@@ -68,7 +68,7 @@ will not work.
 * `frontal.port` the service port open in the service (mandatory)
 * `frontal.tls` the type of [tls](https://en.wikipedia.org/wiki/Transport_Layer_Security),
 the allowed options are (optional, default `force`):
-  - `force` will redirect requests going to `insecure_port` to `secure_port` with `301 - Redirect Permanent`
-  - `yes` will respond in both ports `insecure_port` and `secure_port` but it will not redirect. 
-  - `no` will only respond to the `insecure_port`
-  - `only` will only respond to the `secure_port`
+  - `force` will redirect requests going to `http_port` to `https_port` with `301 - Redirect Permanent`
+  - `yes` will respond in both ports `http_port` and `https_port` but it will not redirect. 
+  - `no` will only respond to the `http_port`
+  - `only` will only respond to the `https_port`

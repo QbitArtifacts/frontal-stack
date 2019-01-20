@@ -12,7 +12,7 @@ cron service to renew the certs periodically.
 
 ```yaml
 # file: stack.yml
-# This example starts a mariadb server and phpmyadmin on domain admin.example.com
+# This example starts a mariadb server and adminer on url https://admin.example.com/db
 version: "3.7"
 services:
   frontal:

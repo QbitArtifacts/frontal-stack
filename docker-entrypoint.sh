@@ -134,7 +134,7 @@ docker service ls --format='{{.Name}}' | while read service;do
       add_cert $domain $CRT_LIST
     fi
 
-    generate_backend $service_network $target_port >> $HAPROXY_CONFIG_BACKENDS
+    generate_backend $service_network $target_port $path >> $HAPROXY_CONFIG_BACKENDS
 
     case $tls in
       force)

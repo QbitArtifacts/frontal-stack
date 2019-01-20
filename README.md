@@ -66,7 +66,7 @@ will not work.
 * `frontal.target.port` the service port open in the service (mandatory)
 * `frontal.tls` the type of [tls](https://en.wikipedia.org/wiki/Transport_Layer_Security),
 the allowed options are (optional, default `force`):
-  - `force` will redirect requests going to port `80` to `443` with `301 - Redirect Permanent`
+  - `force` will redirect requests going to port `80` to `443` with `302 - Found`
   - `yes` will respond in both ports `80` and `443` but it will not redirect. 
   - `no` will only respond to port `80`
   - `only` will only respond to port `443`

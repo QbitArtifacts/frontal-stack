@@ -60,7 +60,7 @@ services:
 [Letsencrypt Terms Of Service](https://letsencrypt.org/repository/), if it is not accepted the certificate issuing
 will not work.
 
-## Service Labels
+## Service labels
 * `frontal.domain` the (sub)domain pointed to the host(s) to access from outside (mandatory)
 * `frontal.path` the path for access from outside (optional, default `/`)
 * `frontal.https_port` the secure port open to outside (optional, default `443`)

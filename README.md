@@ -1,4 +1,4 @@
-# docker-frontal
+# docker-web-frontal
 
 Docker project to configure a `http/https` **web frontal** service for **docker swarm** with automatic ssl - powered
 by [HAProxy](http://www.haproxy.org/),  [letsencrypt](https://letsencrypt.org/) and [crond](https://en.wikipedia.org/wiki/Cron).

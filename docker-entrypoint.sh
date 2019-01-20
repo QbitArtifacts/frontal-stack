@@ -5,6 +5,8 @@ export HAPROXY_CONFIG_BACKENDS=/etc/haproxy/backends.cfg
 export SSL_DIR=/etc/ssl
 export CRT_LIST=$SSL_DIR/crt-list.txt
 
+echo -n $HAPROXY_CONFIG_BACKENDS
+
 if ! test -f $SSL_DIR;then
   mkdir -p $SSL_DIR
 fi
@@ -153,5 +155,7 @@ docker service ls --format='{{.Name}}' | while read service;do
 done
 
 haproxy -f $HAPROXY_CONFIG -f $HAPROXY_CONFIG_BACKENDS
+
+sleep 300
 
 # docker service inspect rec-stage_frontal --format='{{json .Spec.TaskTemplate.Networks}}' | jq -r '.[0].Target'

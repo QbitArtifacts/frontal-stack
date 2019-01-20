@@ -83,8 +83,10 @@ add_cert(){
 generate_backend(){
   name=$1
   port=$2
+  path=$3
   echo -e "backend $name"
   echo -e "  server $name $name:$port check"
+  echo -e "  http-request set-path %[path,regsub(^$path,/)] if { path_beg $path }"
 }
 
 generate_ssl_redirect(){

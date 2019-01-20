@@ -20,7 +20,7 @@ Some notes we have to take into account
 ## Sample configuration
 
 ```yaml
-# file: stack.yml
+# file: example-stack.yml
 # This example starts a mariadb server and adminer on url https://admin.example.com/db
 version: "3.7"
 
@@ -49,8 +49,6 @@ services:
     labels:
       frontal.domain: admin.example.com
       frontal.path: /db
-      frontal.https_port: 443
-      frontal.http_port: 80
       frontal.target.port: 8080
       frontal.tls: force
   
@@ -65,12 +63,10 @@ will not work.
 ## Service labels
 * `frontal.domain` the (sub)domain pointed to the host(s) to access from outside (mandatory)
 * `frontal.path` the path for access from outside (optional, default `/`)
-* `frontal.https_port` the secure port open to outside (optional, default `443`)
-* `frontal.http_port` the insecure port open to outside (optional, default `80`)
 * `frontal.target.port` the service port open in the service (mandatory)
 * `frontal.tls` the type of [tls](https://en.wikipedia.org/wiki/Transport_Layer_Security),
 the allowed options are (optional, default `force`):
-  - `force` will redirect requests going to `http_port` to `https_port` with `301 - Redirect Permanent`
-  - `yes` will respond in both ports `http_port` and `https_port` but it will not redirect. 
-  - `no` will only respond to the `http_port`
-  - `only` will only respond to the `https_port`
+  - `force` will redirect requests going to port `80` to `443` with `301 - Redirect Permanent`
+  - `yes` will respond in both ports `80` and `443` but it will not redirect. 
+  - `no` will only respond to port `80`
+  - `only` will only respond to port `443`

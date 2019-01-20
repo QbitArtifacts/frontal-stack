@@ -32,7 +32,7 @@ services:
     image: qbitartifacts/frontal
     environment:
       - LE_EMAIL=admin@example.com
-      - LE_ACCEPT_TOS=yes
+      - LE_AGREE_TOS=yes
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - certs:/etc/letsencrypt
@@ -56,8 +56,8 @@ services:
 ```
 ## Environment variables
 * `LE_EMAIL` the letsencrypt notification email
-* `LE_ACCEPT_TOS` you have to tell the service if it have to accept or not the
-[Letsencrypt Terms Of Service](https://letsencrypt.org/repository/), if it is not accepted the certificate issuing
+* `LE_AGREE_TOS` you have to tell the service if it have to agree or not the
+[Letsencrypt Terms Of Service](https://letsencrypt.org/repository/), if it is not agreed the certificate issuing
 will not work.
 
 ## Service labels

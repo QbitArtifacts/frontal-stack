@@ -8,21 +8,34 @@ The `frontal` service uses the docker endpoint `/var/run/docker.sock` to get the
 `frontal.*` (described below), then uses the letsencrypt service to create the certificates, and then installs a
 cron service to renew the certs periodically.
 
+## Limits
+Some notes we have to take into account
+* [Letsencrypt rate limits](https://letsencrypt.org/docs/rate-limits/)
+  
+  If we deploy a service with multiple instances we have to know that each instance will query letsencrypt servers
+  to create/renew the certificates, so it maybe exceeds the rate limits, one (semi)solution is to scale the service
+  leaving some time between scales, and for the renewals it will not be a problem because the cron renew is setup
+  randomly. Another solution can be copy or share a volume between containers.
+
 ## Sample configuration
 
 ```yaml
 # file: stack.yml
 # This example starts a mariadb server and adminer on url https://admin.example.com/db
 version: "3.7"
+
+volumes:
+  certs:
+
 services:
   frontal:
     image: qbitartifacts/frontal
     environment:
       - LE_EMAIL=admin@example.com
       - LE_ACCEPT_TOS=yes
-      - LE_EMAIL=admin@example.com
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - certs:/etc/letsencrypt
     ports:
       - 80:80
       - 443:443
@@ -41,6 +54,11 @@ services:
       frontal.tls: force
   
 ```
+## Environment variables
+* `LE_EMAIL` the letsencrypt notification email
+* `LE_ACCEPT_TOS` you have to tell the service if it have to accept or not the
+[Letsencrypt Terms Of Service](https://letsencrypt.org/repository/), if it is not accepted the certificate issuing
+will not work.
 
 ## Service Labels
 * `frontal.domain` the (sub)domain pointed to the host(s) to access from outside (mandatory)
@@ -48,7 +66,8 @@ services:
 * `frontal.https_port` the secure port open to outside (optional, default `443`)
 * `frontal.http_port` the insecure port open to outside (optional, default `80`)
 * `frontal.port` the service port open in the service (mandatory)
-* `frontal.tls` the type of ssl, the allowed options are (optional, default `force`):
+* `frontal.tls` the type of [tls](https://en.wikipedia.org/wiki/Transport_Layer_Security),
+the allowed options are (optional, default `force`):
   - `force` will redirect requests going to `insecure_port` to `secure_port` with `301 - Redirect Permanent`
   - `yes` will respond in both ports `insecure_port` and `secure_port` but it will not redirect. 
   - `no` will only respond to the `insecure_port`

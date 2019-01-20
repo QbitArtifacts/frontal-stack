@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 
 export HAPROXY_CONFIG=/etc/haproxy/haproxy.cfg 
+export HAPROXY_CONFIG_BACKENDS=/etc/haproxy/backends.cfg 
 export SSL_DIR=/etc/ssl
 export CRT_LIST=$SSL_DIR/crt-list.txt
-export TMP_CONFIG_FRONTEND=/tmp/$RANDOM$RANDOM$RANDOM
-export TMP_CONFIG_BACKEND=/tmp/$RANDOM$RANDOM$RANDOM
 
 if ! test -f $SSL_DIR;then
   mkdir -p $SSL_DIR
@@ -128,22 +127,22 @@ docker service ls --format='{{.Name}}' | while read service;do
       add_cert $domain $CRT_LIST
     fi
 
-    generate_backend $service_name $target_port >> $TMP_CONFIG_BACKEND
+    generate_backend $service_name $target_port >> $HAPROXY_CONFIG_BACKENDS
 
     case $tls in
       force)
-        generate_ssl_redirect $domain >> $TMP_CONFIG_FRONTEND
-        generate_link_ssl $domain $service_name >> $TMP_CONFIG_FRONTEND
+        generate_ssl_redirect $domain >> $HAPROXY_CONFIG
+        generate_link_ssl $domain $service_name >> $HAPROXY_CONFIG
       ;;
       yes)
-        generate_link $domain $service_name >> $TMP_CONFIG_FRONTEND
-        generate_link_ssl $domain $service_name >> $TMP_CONFIG_FRONTEND
+        generate_link $domain $service_name >> $HAPROXY_CONFIG
+        generate_link_ssl $domain $service_name >> $HAPROXY_CONFIG
       ;;
       no)
-        generate_link $domain $service_name >> $TMP_CONFIG_FRONTEND
+        generate_link $domain $service_name >> $HAPROXY_CONFIG
       ;;
       only)
-        generate_link_ssl $domain $service_name >> $TMP_CONFIG_FRONTEND
+        generate_link_ssl $domain $service_name >> $HAPROXY_CONFIG
       ;;
       *)
         throw_error "invalid option '$tls' for label frontal.tls" >&2
@@ -152,9 +151,6 @@ docker service ls --format='{{.Name}}' | while read service;do
   fi
 done
 
-cat haproxy.cfg $TMP_CONFIG_FRONTEND $TMP_CONFIG_BACKEND > $HAPROXY_CONFIG
-rm $TMP_CONFIG_FRONTEND $TMP_CONFIG_BACKEND
-
-haproxy -f $HAPROXY_CONFIG
+haproxy -f $HAPROXY_CONFIG -f $HAPROXY_CONFIG_BACKENDS
 
 # docker service inspect rec-stage_frontal --format='{{json .Spec.TaskTemplate.Networks}}' | jq -r '.[0].Target'

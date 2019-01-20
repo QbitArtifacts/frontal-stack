@@ -87,14 +87,14 @@ generate_backend(){
   echo -e "backend $name"
   echo -e "  server $name $name:$port check"
   if [[ "$path" != "/" ]];then
-      echo -e "  redirect code 301 location drop-query append-slash if { path_reg ^$path$ }"
+      echo -e "  http-request redirect code 301 location drop-query append-slash if { path_reg ^$path$ }"
       echo -e "  http-request set-path %[path,regsub(^$path,/)] if { path_beg $path }"
   fi
 }
 
 generate_ssl_redirect(){
   domain=$1
-  echo -e "  redirect scheme https if !{ ssl_fc } { hdr(host) -i $domain }"
+  echo -e "  http-request redirect scheme https if !{ ssl_fc } { hdr(host) -i $domain }"
 }
 
 generate_link(){
@@ -165,4 +165,3 @@ haproxy -f $HAPROXY_CONFIG -f $HAPROXY_CONFIG_BACKENDS
 
 sleep 300
 
-# docker service inspect rec-stage_frontal --format='{{json .Spec.TaskTemplate.Networks}}' | jq -r '.[0].Target'

@@ -104,6 +104,7 @@ generate_link_ssl(){
 
 docker service ls --format='{{.Name}}' | while read service;do
   echo "Detected service '$service'"
+  service_network=`docker service inspect $service --format='{{json .Spec.TaskTemplate.Networks}}' | jq -r '.[0].Aliases[0]'`
 
   domain=`read_label $service "frontal.domain"`
   path=`read_label $service "frontal.path" "/"`
@@ -127,22 +128,22 @@ docker service ls --format='{{.Name}}' | while read service;do
       add_cert $domain $CRT_LIST
     fi
 
-    generate_backend $service_name $target_port >> $HAPROXY_CONFIG_BACKENDS
+    generate_backend $service_network $target_port >> $HAPROXY_CONFIG_BACKENDS
 
     case $tls in
       force)
         generate_ssl_redirect $domain >> $HAPROXY_CONFIG
-        generate_link_ssl $domain $service_name >> $HAPROXY_CONFIG
+        generate_link_ssl $domain $service_network >> $HAPROXY_CONFIG
       ;;
       yes)
-        generate_link $domain $service_name >> $HAPROXY_CONFIG
-        generate_link_ssl $domain $service_name >> $HAPROXY_CONFIG
+        generate_link $domain $service_network >> $HAPROXY_CONFIG
+        generate_link_ssl $domain $service_network >> $HAPROXY_CONFIG
       ;;
       no)
-        generate_link $domain $service_name >> $HAPROXY_CONFIG
+        generate_link $domain $service_network >> $HAPROXY_CONFIG
       ;;
       only)
-        generate_link_ssl $domain $service_name >> $HAPROXY_CONFIG
+        generate_link_ssl $domain $service_network >> $HAPROXY_CONFIG
       ;;
       *)
         throw_error "invalid option '$tls' for label frontal.tls" >&2

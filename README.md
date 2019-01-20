@@ -1,6 +1,12 @@
 # docker-frontal
 
-Docker project to configure a **web frontal** service for **docker swarm** with automatic ssl - powered by [letsencrypt](https://letsencrypt.org/).
+Docker project to configure a `http/https` **web frontal** service for **docker swarm** with automatic ssl - powered
+by [HAProxy](http://www.haproxy.org/),  [letsencrypt](https://letsencrypt.org/) and [crond](https://en.wikipedia.org/wiki/Cron).
+
+## Description
+The `frontal` service uses the docker endpoint `/var/run/docker.sock` to get the list of services and checks for the labels
+`frontal.*` (described below), then uses the letsencrypt service to create the certificates, and then installs a
+cron service to renew the certs periodically.
 
 ## Sample configuration
 
@@ -15,6 +21,8 @@ services:
       - LE_EMAIL=admin@example.com
       - LE_ACCEPT_TOS=yes
       - LE_EMAIL=admin@example.com
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - 80:80
       - 443:443
@@ -34,7 +42,7 @@ services:
   
 ```
 
-## Labels
+## Service Labels
 * `frontal.domain` the (sub)domain pointed to the host(s) to access from outside (mandatory)
 * `frontal.path` the path for access from outside (optional, default `/`)
 * `frontal.https_port` the secure port open to outside (optional, default `443`)

@@ -1,0 +1,33 @@
+# file: example-stack.yml
+# This example starts a mariadb server and adminer on url https://admin.example.com/db
+version: "3.7"
+
+volumes:
+    certs:
+
+services:
+    frontal:
+        image: qbitartifacts/frontal
+        environment:
+            - LE_EMAIL=admin@example.com
+            - LE_AGREE_TOS=yes
+            - LE_MODE=test
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+            - certs:/etc/letsencrypt
+        ports:
+            - 80:80
+            - 443:443
+
+    db:
+        image: mariadb
+        environment:
+            - MYSQL_ROOT_PASSWORD=example
+    admin:
+        image: adminer
+        labels:
+            frontal.domain: admin.example.com
+            frontal.path: /db
+            frontal.target.port: 8080
+            frontal.tls: force
+

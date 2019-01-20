@@ -150,6 +150,6 @@ docker service ls --format='{{.Name}}' | while read service;do
 done
 
 
-haproxy haproxy -f /etc/haproxy/base.cfg -f /etc/haproxy/redirects.cfg -f /etc/haproxy/backends.cfg -f /etc/haproxy/bindings.cfg
+haproxy -f /etc/haproxy/base.cfg -f /etc/haproxy/redirects.cfg -f /etc/haproxy/backends.cfg -f /etc/haproxy/bindings.cfg
 
 # docker service inspect rec-stage_frontal --format='{{json .Spec.TaskTemplate.Networks}}' | jq -r '.[0].Target'

@@ -82,24 +82,24 @@ generate_backend(){
   name=$1
   port=$2
   echo -e "backend $name"
-  echo -e "\tserver $name $name:$port check"
+  echo -e "  server $name $name:$port check"
 }
 
 generate_ssl_redirect(){
   domain=$1
-  echo -e "\tredirect scheme https if !{ ssl_fc} { hdr(host) -i $domain }"
+  echo -e "  redirect scheme https if !{ ssl_fc} { hdr(host) -i $domain }"
 }
 
 generate_link(){
   domain=$1
   name=$2
-  echo -e "\tuse_backend $name if !{ ssl_fc } { hdr(host) -i $domain }"
+  echo -e "  use_backend $name if !{ ssl_fc } { hdr(host) -i $domain }"
 }
 
 generate_link_ssl(){
   domain=$1
   name=$2
-  echo -e "\tuse_backend $name if { ssl_fc_sni $domain }"
+  echo -e "  use_backend $name if { ssl_fc_sni $domain }"
 }
 
 docker service ls --format='{{.Name}}' | while read service;do

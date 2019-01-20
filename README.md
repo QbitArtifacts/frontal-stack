@@ -50,7 +50,7 @@ services:
       frontal.path: /db
       frontal.https_port: 443
       frontal.http_port: 80
-      frontal.port: 8080
+      frontal.target.port: 8080
       frontal.tls: force
   
 ```
@@ -65,7 +65,7 @@ will not work.
 * `frontal.path` the path for access from outside (optional, default `/`)
 * `frontal.https_port` the secure port open to outside (optional, default `443`)
 * `frontal.http_port` the insecure port open to outside (optional, default `80`)
-* `frontal.port` the service port open in the service (mandatory)
+* `frontal.target.port` the service port open in the service (mandatory)
 * `frontal.tls` the type of [tls](https://en.wikipedia.org/wiki/Transport_Layer_Security),
 the allowed options are (optional, default `force`):
   - `force` will redirect requests going to `http_port` to `https_port` with `301 - Redirect Permanent`

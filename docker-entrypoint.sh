@@ -84,13 +84,14 @@ generate_backend(){
   name=$1
   port=$2
   path=$3
+  domain=$4
   echo -e "backend $name"
   echo -e "  server $name $name:$port check"
   if [[ "$path" != "/" ]];then
       echo -e "  http-request redirect code 301 prefix / append-slash if { path_reg ^$path$ }"
       echo -e "  http-request set-path %[path,regsub(^$path,/)] if { path_beg $path }"
       echo -e "  acl hdr_location res.hdr(Location) -m found"
-      echo -e "  http-response replace-header Location (https?://admin.rec.stage.qbitartifacts.com(:[0-9]+)?)?(/.*) /rdb\2 if hdr_location"
+      echo -e "  http-response replace-header Location (https?://$domain(:[0-9]+)?)?(/.*) $path\2 if hdr_location"
   fi
 }
 
@@ -139,7 +140,7 @@ docker service ls --format='{{.Name}}' | while read service;do
       add_cert $domain $CRT_LIST
     fi
 
-    generate_backend $service_network $target_port $path >> $HAPROXY_CONFIG_BACKENDS
+    generate_backend $service_network $target_port $path $domain >> $HAPROXY_CONFIG_BACKENDS
 
     case $tls in
       force)

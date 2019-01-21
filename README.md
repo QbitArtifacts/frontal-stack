@@ -40,6 +40,10 @@ services:
     ports:
       - 80:80
       - 443:443
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
   db:
     image: mariadb
     environment:

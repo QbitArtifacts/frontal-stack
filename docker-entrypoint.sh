@@ -89,6 +89,8 @@ generate_backend(){
   if [[ "$path" != "/" ]];then
       echo -e "  http-request redirect code 301 prefix / append-slash if { path_reg ^$path$ }"
       echo -e "  http-request set-path %[path,regsub(^$path,/)] if { path_beg $path }"
+      echo -e "  acl hdr_location res.hdr(Location) -m found"
+      echo -e "  http-response replace-header Location (https?://admin.rec.stage.qbitartifacts.com(:[0-9]+)?)?(/.*) /rdb\2 if hdr_location"
   fi
 }
 

@@ -1,5 +1,10 @@
 # docker-web-frontal
 
+![](https://img.shields.io/docker/pulls/qbitartifacts/web-frontal.svg)
+![](https://img.shields.io/docker/stars/qbitartifacts/web-frontal.svg)
+![](https://img.shields.io/microbadger/image-size/qbitartifacts/web-frontal.svg)
+![](https://img.shields.io/microbadger/layers/qbitartifacts/web-frontal.svg)
+
 Docker project to configure a `http/https` **web frontal** service for **docker swarm** with automatic ssl - powered
 by [HAProxy](http://www.haproxy.org/),  [letsencrypt](https://letsencrypt.org/) and [crond](https://en.wikipedia.org/wiki/Cron).
 

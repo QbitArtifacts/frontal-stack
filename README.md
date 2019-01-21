@@ -1,4 +1,10 @@
-# docker-frontal
+# docker-web-frontal
+
+![](https://img.shields.io/docker/pulls/qbitartifacts/web-frontal.svg)
+![](https://img.shields.io/docker/stars/qbitartifacts/web-frontal.svg)
+![](https://img.shields.io/microbadger/image-size/qbitartifacts/web-frontal.svg)
+![](https://img.shields.io/microbadger/layers/qbitartifacts/web-frontal.svg)
+![](https://img.shields.io/docker/build/qbitartifacts/web-frontal.svg)
 
 Docker project to configure a `http/https` **web frontal** service for **docker swarm** with automatic ssl - powered
 by [HAProxy](http://www.haproxy.org/),  [letsencrypt](https://letsencrypt.org/) and [crond](https://en.wikipedia.org/wiki/Cron).
@@ -29,7 +35,7 @@ volumes:
 
 services:
   frontal:
-    image: qbitartifacts/frontal
+    image: qbitartifacts/web-frontal
     environment:
       - LE_EMAIL=admin@example.com
       - LE_AGREE_TOS=yes
@@ -40,6 +46,10 @@ services:
     ports:
       - 80:80
       - 443:443
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
   db:
     image: mariadb
     environment:

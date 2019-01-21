@@ -29,7 +29,7 @@ volumes:
 
 services:
   frontal:
-    image: qbitartifacts/frontal
+    image: qbitartifacts/web-frontal
     environment:
       - LE_EMAIL=admin@example.com
       - LE_AGREE_TOS=yes

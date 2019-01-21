@@ -90,8 +90,10 @@ generate_backend(){
   if [[ "$path" != "/" ]];then
       echo -e "  http-request redirect code 301 prefix / append-slash if { path_reg ^$path$ }"
       echo -e "  http-request set-path %[path,regsub(^$path,/)] if { path_beg $path }"
+      echo -e "  http-response replace-header Location (https?://$domain(:[0-9]+)?)?(/.*) $path\3 if { res.hdr(Location) -m found }"
+  else
+      echo -e "  http-response replace-header Location (https?://$domain(:[0-9]+)?)?(/.*) \3 if { res.hdr(Location) -m found }"
   fi
-  echo -e "  http-response replace-header Location (https?://$domain(:[0-9]+)?)?(/.*) $path\3 if { res.hdr(Location) -m found }"
 }
 
 generate_ssl_redirect(){
